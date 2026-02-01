@@ -29,27 +29,33 @@ function changeTab(tabName) {
                 <p style="color: #888; margin-top: 15px;">Немає активних діалогів.</p>
             </div>`;
     }
-    else if (tabName === 'profile') {
+        else if (tabName === 'profile') {
         const savedName = localStorage.getItem('userName') || "Матуся";
         const savedStatus = localStorage.getItem('userStatus') || "Планую прогулянку";
+        const savedDistrict = localStorage.getItem('userDistrict') || "Оболонь";
 
         content.innerHTML = `
             <div class="card">
                 <div class="avatar-container" style="margin: 0 auto 15px; width: 100px; height: 100px; position: relative;">
                     <img src="https://ui-avatars.com{encodeURIComponent(savedName)}&background=ff85a2&color=fff&size=128" 
                          class="avatar" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff85a2; object-fit: cover;">
-                    <div class="upload-btn" style="position: absolute; bottom: 0; right: 0; background: #ff85a2; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; border: 2px solid white;">
-                        <i class="fas fa-camera"></i>
-                    </div>
                 </div>
                 <h3>Мій профіль</h3>
-                <input type="text" id="nameInput" value="${savedName}" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 10px; font-size: 16px;">
-                <input type="text" id="statusInput" value="${savedStatus}" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 15px; font-size: 16px;">
+                <input type="text" id="nameInput" value="${savedName}" placeholder="Ім'я" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 10px;">
+                
+                <select id="districtInput" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 10px; background: white;">
+                    <option value="Оболонь" ${savedDistrict === 'Оболонь' ? 'selected' : ''}>Оболонь</option>
+                    <option value="Позняки" ${savedDistrict === 'Позняки' ? 'selected' : ''}>Позняки</option>
+                    <option value="Центр" ${savedDistrict === 'Центр' ? 'selected' : ''}>Центр</option>
+                    <option value="Голосієво" ${savedDistrict === 'Голосієво' ? 'selected' : ''}>Голосієво</option>
+                </select>
+
+                <input type="text" id="statusInput" value="${savedStatus}" placeholder="Статус" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 15px;">
                 <button class="main-btn" onclick="saveProfile()" style="width: 90%; padding: 15px;">Зберегти профіль</button>
             </div>`;
     }
-}
 
+}
 function filterMoms(type) {
     const list = document.getElementById('moms-list');
     if (!list) return;
@@ -102,9 +108,13 @@ function openChat(name) {
 function saveProfile() {
     const name = document.getElementById('nameInput').value;
     const status = document.getElementById('statusInput').value;
+    const district = document.getElementById('districtInput').value;
+    
     localStorage.setItem('userName', name);
     localStorage.setItem('userStatus', status);
-    showToast("Збережено! ✨");
+    localStorage.setItem('userDistrict', district);
+    
+    showToast("Профіль та район збережено! ✨");
     changeTab('profile');
 }
 
