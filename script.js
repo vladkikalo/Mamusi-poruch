@@ -1,42 +1,35 @@
 const allMoms = [
     { 
-        name: "Олена", 
-        status: "🏃‍♀️ Йду в парк", 
-        dist: "300м", 
-        age: "1.2 р.", 
-        type: "walk", 
-        img: "mom1.jpg",
-        about: "Привіт! Люблю довгі прогулянки та каву без цукру. Моєму синочку 1 рік і 2 місяці, ми дуже активні!",
-        interests: ["Еко-виховання", "Йога", "Монтессорі"]
+        name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", img: "mom1.jpg",
+        about: "Любимо активні ігри та довгі прогулянки. Шукаємо компанію!", interests: ["Еко", "Йога"]
     },
     { 
-        name: "Марина", 
-        status: "☕ На каву", 
-        dist: "600м", 
-        age: "8 міс.", 
-        type: "coffee", 
-        img: "mom2.jpg",
-        about: "Шукаю подруг для спокійних посиденьок, поки малеча спить у візочках.",
-        interests: ["Книги", "Психологія", "Серіали"]
+        name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", img: "mom2.jpg",
+        about: "Спокійні прогулянки з кавою. Буду рада знайомству.", interests: ["Книги", "Психологія"]
     },
     { 
-        name: "Світлана", 
-        status: "👶 Немовлята", 
-        dist: "1.2 км", 
-        age: "3 міс.", 
-        type: "baby", 
-        img: "mom3.jpg",
-        about: "Ми ще зовсім маленькі, тому гуляємо повільно біля озера.",
-        interests: ["ГВ", "Здоровий сон", "Фотографія"]
+        name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", img: "mom3.jpg",
+        about: "Ми ще маленькі, гуляємо повільно біля озера.", interests: ["ГВ", "Фото"]
     }
 ];
+
+let currentFilter = 'all';
+
 function changeTab(tabName) {
     const content = document.getElementById('content');
-    
+    window.scrollTo(0, 0);
+
     if (tabName === 'map') {
         content.innerHTML = `
             <div class="card" style="width: 100%; max-width: 380px; background: none; box-shadow: none; padding: 0;">
                 <h3 style="text-align: left; margin-left: 10px;">Хто поруч?</h3>
+                <div style="padding: 0 10px 15px 10px;">
+                    <div style="position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 15px; top: 15px; color: #888;"></i>
+                        <input type="text" id="searchInput" oninput="filterMoms(currentFilter)" placeholder="Пошук матусі..." 
+                               style="width: 100%; padding: 12px 12px 12px 40px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                </div>
                 <div class="filter-container">
                     <button class="filter-tag active" onclick="filterMoms('all')">Всі</button>
                     <button class="filter-tag" onclick="filterMoms('walk')">🏃‍♀️ Гуляють</button>
@@ -54,7 +47,7 @@ function changeTab(tabName) {
                 <p style="color: #888; margin-top: 15px;">Немає активних діалогів.</p>
             </div>`;
     }
-        else if (tabName === 'profile') {
+    else if (tabName === 'profile') {
         const savedName = localStorage.getItem('userName') || "Матуся";
         const savedStatus = localStorage.getItem('userStatus') || "Планую прогулянку";
         const savedDistrict = localStorage.getItem('userDistrict') || "Оболонь";
@@ -63,94 +56,102 @@ function changeTab(tabName) {
             <div class="card">
                 <div class="avatar-container" style="margin: 0 auto 15px; width: 100px; height: 100px; position: relative;">
                     <img src="https://ui-avatars.com{encodeURIComponent(savedName)}&background=ff85a2&color=fff&size=128" 
-                         class="avatar" style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff85a2; object-fit: cover;">
+                         style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff85a2; object-fit: cover;">
                 </div>
                 <h3>Мій профіль</h3>
-                <input type="text" id="nameInput" value="${savedName}" placeholder="Ім'я" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 10px;">
+                <input type="text" id="nameInput" value="${savedName}" placeholder="Ім'я" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 10px; font-size: 16px;">
                 
-                <select id="districtInput" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 10px; background: white;">
+                <select id="districtInput" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 10px; background: white; font-size: 16px;">
                     <option value="Оболонь" ${savedDistrict === 'Оболонь' ? 'selected' : ''}>Оболонь</option>
                     <option value="Позняки" ${savedDistrict === 'Позняки' ? 'selected' : ''}>Позняки</option>
                     <option value="Центр" ${savedDistrict === 'Центр' ? 'selected' : ''}>Центр</option>
                     <option value="Голосієво" ${savedDistrict === 'Голосієво' ? 'selected' : ''}>Голосієво</option>
                 </select>
 
-                <input type="text" id="statusInput" value="${savedStatus}" placeholder="Статус" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 85%; margin-bottom: 15px;">
+                <input type="text" id="statusInput" value="${savedStatus}" placeholder="Статус" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 15px; font-size: 16px;">
                 <button class="main-btn" onclick="saveProfile()" style="width: 90%; padding: 15px;">Зберегти профіль</button>
             </div>`;
     }
-
 }
+
 function filterMoms(type) {
+    currentFilter = type;
     const list = document.getElementById('moms-list');
+    const query = document.getElementById('searchInput')?.value.toLowerCase() || "";
     if (!list) return;
 
-    // Оновлюємо активну кнопку фільтра
-    document.querySelectorAll('.filter-tag').forEach(btn => btn.classList.remove('active'));
-    if (event && event.target && event.target.classList.contains('filter-tag')) {
-        event.target.classList.add('active');
-    }
+    document.querySelectorAll('.filter-tag').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.innerText.toLowerCase().includes(type) || (type === 'all' && btn.innerText === 'Всі')) btn.classList.add('active');
+    });
 
-    const filtered = type === 'all' ? allMoms : allMoms.filter(mom => mom.type === type);
+    const filtered = allMoms.filter(mom => (type === 'all' || mom.type === type) && mom.name.toLowerCase().includes(query));
+
     list.innerHTML = filtered.map(mom => `
-        <div class="mom-item" style="padding: 20px; margin-bottom: 15px;">
-            <!-- Тепер клік по фото відкриває деталі -->
-            <div class="avatar-wrapper" onclick="viewMomDetails('${mom.name}')" style="position: relative; width: 65px; height: 65px; margin-right: 15px; cursor: pointer;">
-                <img src="${mom.img}" 
-                     onerror="this.src='https://ui-avatars.com{encodeURIComponent(mom.name)}&background=ff85a2&color=fff&size=128'" 
-                     style="width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid #ff85a2;">
+        <div class="mom-item">
+            <div class="avatar-wrapper" onclick="viewMomDetails('${mom.name}')" style="cursor:pointer">
+                <img src="${mom.img}" onerror="this.src='https://ui-avatars.com{mom.name}&background=ff85a2&color=fff'">
                 <div class="status-online"></div>
             </div>
-            
-            <div class="mom-info" style="flex: 1;" onclick="viewMomDetails('${mom.name}')">
-                <!-- Тепер клік по імені теж відкриває деталі -->
-                <h4 style="font-size: 18px; margin: 0; cursor: pointer; color: #333;">${mom.name}</h4>
-                <p style="color: #ff85a2; font-weight: bold; font-size: 14px; margin: 3px 0;">${mom.status}</p>
-                <p style="font-size: 13px; color: #888;">${mom.dist} • дитина ${mom.age}</p>
+            <div class="mom-info" onclick="viewMomDetails('${mom.name}')" style="flex:1; cursor:pointer">
+                <h4>${mom.name}</h4>
+                <p style="color: #ff85a2; font-weight: bold;">${mom.status}</p>
+                <p>${mom.dist} • ${mom.age}</p>
             </div>
-            
             <button class="chat-btn" onclick="openChat('${mom.name}')">Написати</button>
-        </div>
-    `).join('');
-    }
+        </div>`).join('');
+}
+
+function viewMomDetails(name) {
+    const mom = allMoms.find(m => m.name === name);
+    document.getElementById('content').innerHTML = `
+        <div class="card" style="padding:0; overflow:hidden; border-radius:25px; text-align:left;">
+            <img src="${mom.img}" onerror="this.src='https://ui-avatars.com{mom.name}&background=ff85a2&color=fff'" style="width:100%; height:250px; object-fit:cover;">
+            <div style="padding:20px;">
+                <button onclick="changeTab('map')" class="main-btn" style="padding:8px 15px; margin-bottom:15px; background:#eee; color:#333;">← Назад</button>
+                <h2>${mom.name}, ${mom.age}</h2>
+                <p style="color:#ff85a2; font-weight:bold;">${mom.status}</p>
+                <p style="color:#555; line-height:1.6; margin:15px 0;">${mom.about}</p>
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    ${mom.interests.map(i => `<span style="background:#f0f0f0; padding:5px 12px; border-radius:15px; font-size:12px;">#${i}</span>`).join('')}
+                </div>
+                <button class="main-btn" style="width:100%; margin-top:25px; padding:18px; font-size:18px;" onclick="openChat('${mom.name}')">Почати чат</button>
+            </div>
+        </div>`;
+}
 
 function openChat(name) {
     const content = document.getElementById('content');
     content.innerHTML = `
-        <div class="card" style="width: 100%; max-width: 380px; height: 500px; display: flex; flex-direction: column;">
-            <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
-                <button onclick="changeTab('map')" style="background: none; border: none; color: #ff85a2; padding: 10px;"><i class="fas fa-arrow-left fa-lg"></i></button>
-                <h3 style="margin-left: 10px;">${name}</h3>
+        <div class="card" style="width: 100%; max-width: 380px; height: 500px; display: flex; flex-direction: column; padding:0; overflow:hidden;">
+            <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 15px;">
+                <button onclick="changeTab('map')" style="background: none; border: none; color: #ff85a2; cursor:pointer;"><i class="fas fa-arrow-left fa-lg"></i></button>
+                <h3 style="margin-left: 15px;">${name}</h3>
             </div>
-            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 15px; background: #fafafa; margin: 10px 0; border-radius: 10px;">
-                <div style="background: #eee; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%; font-size: 15px;">Привіт! Як справи? 😊</div>
+            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 15px; background: #fafafa; text-align:left;">
+                <div style="background: #eee; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%;">Привіт! Як справи? 😊</div>
             </div>
-            <div style="display: flex; gap: 8px; padding: 10px;">
+            <div style="display: flex; gap: 8px; padding: 15px; border-top: 1px solid #eee; background:white;">
                 <input type="text" id="msgInput" placeholder="Повідомлення..." style="flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px;">
-                <button class="main-btn" style="margin:0; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                <button class="main-btn" style="margin:0; width: 45px; height: 45px; border-radius: 50%;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>`;
 }
 
 function saveProfile() {
-    const name = document.getElementById('nameInput').value;
-    const status = document.getElementById('statusInput').value;
-    const district = document.getElementById('districtInput').value;
-    
-    localStorage.setItem('userName', name);
-    localStorage.setItem('userStatus', status);
-    localStorage.setItem('userDistrict', district);
-    
-    showToast("Профіль та район збережено! ✨");
+    localStorage.setItem('userName', document.getElementById('nameInput').value);
+    localStorage.setItem('userStatus', document.getElementById('statusInput').value);
+    localStorage.setItem('userDistrict', document.getElementById('districtInput').value);
+    alert("Збережено! ✨");
     changeTab('profile');
 }
 
 function sendMessage() {
     const input = document.getElementById('msgInput');
     const chatBox = document.getElementById('chat-box');
-    if (input.value.trim() !== "") {
+    if (input && input.value.trim() !== "") {
         const msg = document.createElement('div');
-        msg.style = "background: #ff85a2; color: white; padding: 10px 15px; border-radius: 18px; margin: 8px 0; margin-left: auto; max-width: 80%; font-size: 15px;";
+        msg.style = "background: #ff85a2; color: white; padding: 10px 15px; border-radius: 18px; margin: 8px 0; margin-left: auto; max-width: 80%; font-size: 15px; text-align:left;";
         msg.innerText = input.value;
         chatBox.appendChild(msg);
         input.value = "";
@@ -158,63 +159,10 @@ function sendMessage() {
     }
 }
 
-function showToast(message) {
-    let toast = document.getElementById('toast');
-    if (!toast) {
-        toast = document.createElement('div');
-        toast.id = 'toast';
-        toast.className = 'toast';
-        document.body.appendChild(toast);
-    }
-    toast.innerText = message;
-    toast.classList.add('show');
-    setTimeout(() => { toast.classList.remove('show'); }, 3000);
-}
-
-function likeMom(element) {
-    const heart = element.querySelector('.heart-animation');
-    heart.classList.add('animate-heart');
-    setTimeout(() => { heart.classList.remove('animate-heart'); }, 800);
-    showToast("Вам сподобався профіль! ❤️");
-}
-
-window.addEventListener('load', () => {
+document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const splash = document.getElementById('splash-screen');
         if (splash) splash.classList.add('fade-out');
+        changeTab('map');
     }, 2000);
 });
-function viewMomDetails(name) {
-    const mom = allMoms.find(m => m.name === name);
-    const content = document.getElementById('content');
-    
-    content.innerHTML = `
-        <div class="card" style="width: 100%; max-width: 380px; text-align: left; padding: 0; overflow: hidden; border-radius: 25px;">
-            <div style="position: relative;">
-                <img src="${mom.img}" onerror="this.src='https://ui-avatars.com{mom.name}&background=ff85a2&color=fff'" style="width: 100%; height: 250px; object-fit: cover;">
-                <button onclick="changeTab('map')" style="position: absolute; top: 15px; left: 15px; background: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); color: #ff85a2; cursor: pointer;">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-            </div>
-            
-            <div style="padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <h2 style="margin: 0;">${mom.name}, ${mom.age}</h2>
-                    <span style="background: #ffeef2; color: #ff85a2; padding: 5px 12px; border-radius: 15px; font-size: 14px; font-weight: bold;">${mom.dist}</span>
-                </div>
-                <p style="color: #ff85a2; font-weight: bold; margin: 10px 0;">${mom.status}</p>
-                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
-                <p style="color: #555; line-height: 1.5;">${mom.about}</p>
-                
-                <h4 style="margin: 15px 0 10px 0;">Інтереси:</h4>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    ${mom.interests.map(i => `<span style="background: #f0f0f0; padding: 5px 10px; border-radius: 10px; font-size: 12px; color: #666;">#${i}</span>`).join('')}
-                </div>
-                
-                <button class="main-btn" onclick="openChat('${mom.name}')" style="width: 100%; margin-top: 25px; padding: 18px; font-size: 18px;">
-                    <i class="fas fa-comments"></i> Почати чат
-                </button>
-            </div>
-        </div>
-    `;
-}
