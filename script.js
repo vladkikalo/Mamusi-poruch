@@ -1,184 +1,227 @@
-// 1. БАЗА ДАНИХ (Перевір наявність ком після кожного об'єкта)
+// ===================================================
+// 1. БАЗА ДАНИХ (БЕЗ ЗМІН)
+// ===================================================
+const districtCoords = {
+    "Всі райони": "50.4501,30.5234",
+    "Оболонь": "50.5050,30.5030",
+    "Позняки": "50.3980,30.6330",
+    "Центр": "50.4500,30.5230",
+    "Голосієво": "50.3950,30.5070"
+};
+
 const allMoms = [
     { 
-        name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", img: "mom1.jpg", district: "Оболонь",
-        about: "Любимо активні ігри та довгі прогулянки. Шукаємо компанію!", interests: ["Еко", "Йога"]
+        name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", district: "Оболонь", 
+        img: "mom1.jpg", backup: "https://images.unsplash.com",
+        about: "Любимо активні ігри.", interests: ["Йога", "Еко"]
     },
     { 
-        name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", img: "mom2.jpg", district: "Позняки",
-        about: "Спокійні прогулянки з кавою. Буду рада знайомству.", interests: ["Книги", "Психологія"]
+        name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", district: "Позняки", 
+        img: "mom2.jpg", backup: "https://images.unsplash.com",
+        about: "Люблю читати.", interests: ["Книги", "Психологія"]
     },
     { 
-        name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", img: "mom3.jpg", district: "Оболонь",
-        about: "Ми ще маленькі, гуляємо повільно біля озера.", interests: ["ГВ", "Фото"]
+        name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", district: "Оболонь", 
+        img: "mom3.jpg", backup: "https://images.unsplash.com",
+        about: "Гуляємо повільно.", interests: ["Фото", "ГВ"]
     }
 ];
 
 let currentFilter = 'all';
+const getAvatar = (name) => `https://ui-avatars.com{encodeURIComponent(name)}&background=ff85a2&color=fff`;
 
-function changeTab(tabName) {
-    const content = document.getElementById('content');
-    if (!content) return;
-    window.scrollTo(0, 0);
-
-    if (tabName === 'map') {
-        content.innerHTML = `
-            <div class="card" style="width: 100%; max-width: 380px; background: none; box-shadow: none; padding: 0;">
-                <h3 style="text-align: left; margin-left: 10px;">Хто поруч?</h3>
-                <div style="padding: 0 10px 15px 10px;">
-                    <div style="position: relative;">
-                        <i class="fas fa-search" style="position: absolute; left: 15px; top: 15px; color: #888;"></i>
-                        <input type="text" id="searchInput" oninput="filterMoms(currentFilter)" placeholder="Пошук матусі..." 
-                               style="width: 100%; padding: 12px 12px 12px 40px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px; box-sizing: border-box;">
-                    </div>
-                </div>
-                <div class="filter-container">
-                    <button class="filter-tag active" onclick="filterMoms('all')">Всі</button>
-                    <button class="filter-tag" onclick="filterMoms('walk')">🏃‍♀️ Гуляють</button>
-                    <button class="filter-tag" onclick="filterMoms('coffee')">☕ На каву</button>
-                    <button class="filter-tag" onclick="filterMoms('baby')">👶 Немовлята</button>
-                </div>
-                <div id="moms-list"></div>
-            </div>`;
-        filterMoms('all');
-    } 
-    else if (tabName === 'chats') {
-        content.innerHTML = `<div class="card"><h3>Повідомлення</h3><p style="color:#888;">Немає активних діалогів.</p></div>`;
-    }
-    else if (tabName === 'profile') {
-        const savedName = localStorage.getItem('userName') || "Матуся";
-        const savedStatus = localStorage.getItem('userStatus') || "Планую прогулянку";
-        const savedDistrict = localStorage.getItem('userDistrict') || "Оболонь";
-
-        content.innerHTML = `
-            <div class="card">
-                <div class="avatar-container" style="margin: 0 auto 15px; width: 100px; height: 100px; position: relative;">
-                    <img src="https://ui-avatars.com{encodeURIComponent(savedName)}&background=ff85a2&color=fff&size=128" 
-                         style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff85a2; object-fit: cover;">
-                </div>
-                <h3>Мій профіль</h3>
-                <input type="text" id="nameInput" value="${savedName}" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 10px; font-size: 16px;">
-                <select id="districtInput" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 10px; background: white; font-size: 16px;">
-                    <option value="Оболонь" ${savedDistrict === 'Оболонь' ? 'selected' : ''}>Оболонь</option>
-                    <option value="Позняки" ${savedDistrict === 'Позняки' ? 'selected' : ''}>Позняки</option>
-                    <option value="Центр" ${savedDistrict === 'Центр' ? 'selected' : ''}>Центр</option>
-                    <option value="Голосієво" ${savedDistrict === 'Голосієво' ? 'selected' : ''}>Голосієво</option>
-                </select>
-                <input type="text" id="statusInput" value="${savedStatus}" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 15px; font-size: 16px;">
-                <button class="main-btn" onclick="saveProfile()" style="width: 90%; padding: 15px;">Зберегти профіль</button>
-            </div>`;
-    }
-}
-
+// ===================================================
+// 2. ВИПРАВЛЕНА ФІЛЬТРАЦІЯ ЗА РАЙОНОМ (ОСНОВНИЙ ФІКС)
+// ===================================================
 function filterMoms(type) {
     currentFilter = type;
     const list = document.getElementById('moms-list');
-    const query = document.getElementById('searchInput')?.value.toLowerCase() || "";
-    const myDistrict = localStorage.getItem('userDistrict') || "Оболонь";
-    
     if (!list) return;
 
-    document.querySelectorAll('.filter-tag').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.innerText.toLowerCase().includes(type) || (type === 'all' && btn.innerText === 'Всі')) btn.classList.add('active');
-    });
+    // Отримуємо район, який вибрав користувач (або за замовчуванням "Всі райони")
+    const selectedDistrict = localStorage.getItem('userDistrict') || "Всі райони";
+    const searchQuery = document.getElementById('searchInput')?.value.toLowerCase() || "";
 
     const filtered = allMoms.filter(mom => {
+        // 1. Фільтр за типом (прогулянка/кава)
         const matchesType = (type === 'all' || mom.type === type);
-        const matchesSearch = mom.name.toLowerCase().includes(query);
-        const matchesDistrict = mom.district === myDistrict;
+        
+        // 2. Фільтр за пошуком імені
+        const matchesSearch = mom.name.toLowerCase().includes(searchQuery);
+        
+        // 3. Фільтр за РАЙОНОМ (Якщо не обрано "Всі райони", то показуємо тільки збіги)
+        const matchesDistrict = (selectedDistrict === "Всі райони" || mom.district === selectedDistrict);
+
         return matchesType && matchesSearch && matchesDistrict;
     });
-
-    if (filtered.length === 0) {
-        list.innerHTML = `<p style="padding:20px; color:#888;">У районі ${myDistrict} поки нікого не знайдено 📍</p>`;
-        return;
-    }
-
-    list.innerHTML = filtered.map(mom => `
-        <div class="mom-item">
-            <div class="avatar-wrapper" onclick="viewMomDetails('${mom.name}')" style="cursor:pointer">
-                <img src="${mom.img}" onerror="this.src='https://ui-avatars.com{mom.name}&background=ff85a2&color=fff'">
-                <div class="status-online"></div>
+    
+    list.innerHTML = filtered.length ? filtered.map(mom => `
+        <div class="mom-item" onclick="viewMomDetails('${mom.name}')" style="display:flex; align-items:center; background:white; margin:10px 5px; padding:12px; border-radius:20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;">
+            <img src="${mom.img}" onerror="this.onerror=null; this.src='${mom.backup}';" 
+                 style="width:55px; height:55px; border-radius:50%; object-fit: cover; background:#f0f0f0;">
+            <div style="flex:1; margin-left: 12px;">
+                <h4 style="margin:0;">${mom.name}</h4>
+                <p style="color:#ff85a2; font-size:13px; margin:2px 0;">${mom.status}</p>
+                <p style="color:#888; font-size:11px; margin:0;">📍 ${mom.district}</p>
             </div>
-            <div class="mom-info" onclick="viewMomDetails('${mom.name}')" style="flex:1; cursor:pointer">
-                <h4>${mom.name}</h4>
-                <p style="color: #ff85a2; font-weight: bold; font-size: 14px;">${mom.status}</p>
-                <p style="font-size: 12px; color: #888;">${mom.district} • ${mom.age}</p>
-            </div>
-            <button class="chat-btn" onclick="openChat('${mom.name}')">Написати</button>
-        </div>`).join('');
+            <div style="font-size: 18px; color: #ccc;">›</div>
+        </div>`).join('') : `<p style="text-align:center; padding:20px; color:#888;">У цьому районі поки нікого немає 📍</p>`;
 }
 
+// ===================================================
+// 3. ПЕРЕГЛЯД ТАБІВ ТА ПРОФІЛЮ
+// ===================================================
+function changeTab(tabName) {
+    const content = document.getElementById('content');
+    if (!content) return;
+    content.style.opacity = '0';
+    setTimeout(() => {
+        window.scrollTo(0, 0);
+        if (tabName === 'map') renderMap(content);
+        else if (tabName === 'profile') renderProfile(content);
+        content.style.transition = 'opacity 0.3s ease-in-out';
+        content.style.opacity = '1';
+    }, 200);
+}
+
+function renderMap(content) {
+    const myDist = localStorage.getItem('userDistrict') || "Всі райони";
+    const coords = districtCoords[myDist] || districtCoords["Всі райони"];
+    const mapUrl = `https://staticmap.ie{coords}&zoom=14&size=400x250&maptype=mapnik&markers=${coords},red-pushpin`;
+    
+    content.innerHTML = `
+        <div class="card" style="padding: 0; background: none; box-shadow: none;">
+            <h3 style="margin: 15px 10px;">${myDist === 'Всі райони' ? 'Матусі Києва' : 'Поруч ('+myDist+')'}</h3>
+            <div style="padding: 0 10px 15px;">
+                <img src="${mapUrl}" style="width: 100%; height: 180px; border-radius: 20px; border: 2px solid #ff85a2; object-fit: cover;">
+            </div>
+            <div style="padding: 0 10px 10px;">
+                <input type="text" id="searchInput" oninput="filterMoms(currentFilter)" placeholder="Пошук..." 
+                       style="width: 100%; padding: 15px; border-radius: 25px; border: 1px solid #ddd; box-sizing: border-box;">
+            </div>
+            <div class="filter-container" style="display: flex; gap: 10px; padding: 10px; overflow-x: auto; white-space: nowrap;">
+                <button class="filter-tag ${currentFilter==='all'?'active':''}" onclick="filterMoms('all')">Всі</button>
+                <button class="filter-tag" onclick="filterMoms('walk')">🏃‍♀️</button>
+                <button class="filter-tag" onclick="filterMoms('coffee')">☕</button>
+                <button class="filter-tag" onclick="filterMoms('baby')">👶</button>
+            </div>
+            <div id="moms-list"></div>
+        </div>`;
+    filterMoms(currentFilter);
+}
+
+function renderProfile(content) {
+    const name = localStorage.getItem('userName') || "Матуся";
+    const dist = localStorage.getItem('userDistrict') || "Всі райони";
+    const status = localStorage.getItem('userStatus') || "Планую прогулянку";
+    content.innerHTML = `
+        <div class="card" style="text-align: center; padding: 30px 20px;">
+            <div class="avatar-container" ondblclick="likeAnimation(this)" style="position: relative; display: inline-block; cursor: pointer;">
+                <img src="${getAvatar(name)}" style="width:120px; height:120px; border-radius:50%; border:4px solid #ff85a2; object-fit: cover;">
+                <div class="heart-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 50px; opacity: 0; transition: 0.3s; pointer-events: none;">❤️</div>
+            </div>
+            <h3 style="margin-top:15px;">Налаштування</h3>
+            <input type="text" id="nameInput" value="${name}" placeholder="Ім'я" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd; box-sizing: border-box;">
+            <select id="districtInput" style="width:100%; padding:12px; margin-bottom:10px; border-radius:10px; border:1px solid #ddd; background: white;">
+                ${Object.keys(districtCoords).map(d => `<option value="${d}" ${dist === d ? 'selected' : ''}>${d}</option>`).join('')}
+            </select>
+            <input type="text" id="statusInput" value="${status}" placeholder="Статус" style="width:100%; padding:12px; margin-bottom:20px; border-radius:10px; border:1px solid #ddd; box-sizing: border-box;">
+            <button class="main-btn" onclick="saveProfile()" style="width:100%; padding:15px; background:#ff85a2; color:white; border:none; border-radius:12px; font-weight:bold; cursor:pointer;">Зберегти</button>
+        </div>`;
+}
+
+// ===================================================
+// 4. СТОРІНКА МАТУСІ ТА ЧАТ
+// ===================================================
 function viewMomDetails(name) {
     const mom = allMoms.find(m => m.name === name);
-    document.getElementById('content').innerHTML = `
-        <div class="card" style="padding:0; overflow:hidden; border-radius:25px; text-align:left;">
-            <img src="${mom.img}" onerror="this.src='https://ui-avatars.com{mom.name}&background=ff85a2&color=fff'" style="width:100%; height:250px; object-fit:cover;">
-            <div style="padding:20px;">
-                <button onclick="changeTab('map')" class="main-btn" style="padding:8px 15px; margin-bottom:15px; background:#eee; color:#333;">← Назад</button>
-                <h2>${mom.name}, ${mom.age}</h2>
-                <p style="color:#555;">${mom.about}</p>
-                <button class="main-btn" style="width:100%; margin-top:25px; padding:18px;" onclick="openChat('${mom.name}')">Почати чат</button>
-            </div>
-        </div>`;
+    if (!mom) return;
+    const content = document.getElementById('content');
+    content.style.opacity = '0';
+    setTimeout(() => {
+        content.innerHTML = `
+            <div class="card" style="padding: 0; position: relative;">
+                <button onclick="changeTab('map')" style="position: absolute; top: 15px; left: 15px; background: rgba(255,255,255,0.8); border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 20px; z-index: 10; cursor: pointer;">←</button>
+                <div style="width: 100%; height: 250px; overflow: hidden; border-radius: 20px 20px 0 0;">
+                    <img src="${mom.img}" onerror="this.src='${mom.backup}'" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="padding: 20px; text-align: left;">
+                    <h2 style="margin: 0;">${mom.name}</h2>
+                    <p style="color: #ff85a2; font-weight: bold; margin: 10px 0;">📍 ${mom.district} • ${mom.dist}</p>
+                    <p style="color: #666; line-height: 1.5;">${mom.about || "Рада знайомству з новими матусями!"}</p>
+                    <button onclick="openChat('${mom.name}', '${mom.img}', '${mom.backup}')" 
+                            style="width: 100%; margin-top: 20px; padding: 15px; background: #ff85a2; color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer;">
+                        Написати
+                    </button>
+                </div>
+            </div>`;
+        content.style.opacity = '1';
+    }, 200);
 }
 
-function openChat(name) {
+function openChat(name, img, backup) {
     const content = document.getElementById('content');
     content.innerHTML = `
-        <div class="card" style="width: 100%; height: 500px; display: flex; flex-direction: column; padding:0; overflow:hidden;">
-            <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 15px;">
-                <button onclick="changeTab('map')" style="background: none; border: none; color: #ff85a2;"><i class="fas fa-arrow-left fa-lg"></i></button>
-                <h3 style="margin-left: 15px;">${name}</h3>
+        <div class="card" style="height: 85vh; display: flex; flex-direction: column;">
+            <div style="display: flex; align-items: center; padding: 15px; border-bottom: 1px solid #eee;">
+                <button onclick="changeTab('map')" style="background: none; border: none; font-size: 24px; color: #ff85a2; cursor: pointer;">←</button>
+                <img src="${img}" onerror="this.src='${backup}'" style="width:40px; height:40px; border-radius:50%; margin-left:10px; object-fit: cover;">
+                <h4 style="margin-left: 10px;">${name}</h4>
             </div>
-            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 15px; background: #fafafa; text-align:left;">
-                <div style="background: #eee; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%;">Привіт! Як справи? 😊</div>
-                <div id="typing-indicator" style="display:none; font-size: 12px; color: #888; margin-top: 10px;">${name} друкує...</div>
+            <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px;">
+                <div style="align-self: flex-start; background: #f0f0f0; padding: 10px 15px; border-radius: 15px; max-width: 80%;">Привіт! Як справи? 😊</div>
+                <div id="typing-indicator" style="display:none; color:#888; font-size:12px;">${name} друкує...</div>
             </div>
-            <div style="display: flex; gap: 8px; padding: 15px; background:white; border-top:1px solid #eee;">
-                <input type="text" id="msgInput" placeholder="Повідомлення..." style="flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ddd;">
-                <button class="main-btn" style="margin:0; width: 45px; height: 45px; border-radius: 50%;" onclick="sendMessage('${name}')"><i class="fas fa-paper-plane"></i></button>
+            <div style="display: flex; gap: 10px; padding: 10px;">
+                <input type="text" id="messageInput" placeholder="Пишіть..." style="flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ddd;">
+                <button onclick="sendMessage('${name}')" style="background:#ff85a2; color:white; border:none; border-radius:50%; width:45px; height:45px; cursor: pointer;">></button>
             </div>
         </div>`;
-    setTimeout(() => { document.getElementById('typing-indicator').style.display = 'block'; }, 1500);
-}
-
-function saveProfile() {
-    localStorage.setItem('userName', document.getElementById('nameInput').value);
-    localStorage.setItem('userStatus', document.getElementById('statusInput').value);
-    localStorage.setItem('userDistrict', document.getElementById('districtInput').value);
-    alert("Збережено! ✨");
-    changeTab('profile');
 }
 
 function sendMessage(name) {
-    const input = document.getElementById('msgInput');
-    const chatBox = document.getElementById('chat-box');
-    const indicator = document.getElementById('typing-indicator');
-    if (input && input.value.trim() !== "") {
-        const msg = document.createElement('div');
-        msg.style = "background: #ff85a2; color: white; padding: 10px 15px; border-radius: 18px; margin: 8px 0; margin-left: auto; max-width: 80%; text-align:left;";
-        msg.innerText = input.value;
-        chatBox.appendChild(msg);
-        input.value = "";
-        chatBox.scrollTop = chatBox.scrollHeight;
-        if (indicator) indicator.style.display = 'block';
+    const input = document.getElementById('messageInput');
+    const msgBox = document.getElementById('chat-messages');
+    const typing = document.getElementById('typing-indicator');
+    if (!input.value.trim()) return;
+    msgBox.innerHTML += `<div style="align-self: flex-end; background:#ff85a2; color:white; padding:10px 15px; border-radius:15px; max-width:80%;">${input.value}</div>`;
+    input.value = "";
+    msgBox.scrollTop = msgBox.scrollHeight;
+    setTimeout(() => {
+        typing.style.display = 'block';
+        msgBox.scrollTop = msgBox.scrollHeight;
         setTimeout(() => {
-            if (indicator) indicator.style.display = 'none';
-            const reply = document.createElement('div');
-            reply.style = "background: #eee; padding: 10px 15px; border-radius: 18px; margin: 8px 0; max-width: 80%; text-align:left;";
-            reply.innerText = "До зустрічі! ✨";
-            chatBox.appendChild(reply);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }, 3000);
-    }
+            typing.style.display = 'none';
+            msgBox.innerHTML += `<div style="align-self: flex-start; background:#f0f0f0; padding:10px 15px; border-radius:15px; max-width:80%;">Звучить круто! Давайте списатися пізніше 👋</div>`;
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }, 1500);
+    }, 800);
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const splash = document.getElementById('splash-screen');
-        if (splash) splash.classList.add('fade-out');
-        changeTab('map');
-    }, 2000);
-});
+// ===================================================
+// 5. ДОДАТКОВІ ФУНКЦІЇ
+// ===================================================
+function saveProfile() {
+    localStorage.setItem('userName', document.getElementById('nameInput').value);
+    localStorage.setItem('userDistrict', document.getElementById('districtInput').value);
+    localStorage.setItem('userStatus', document.getElementById('statusInput').value);
+    showToast("Профіль оновлено! ✨");
+    setTimeout(() => changeTab('map'), 800);
+}
+
+function showToast(msg) {
+    const t = document.createElement('div');
+    t.innerText = msg;
+    t.style.cssText = "position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.8); color:white; padding:10px 20px; border-radius:20px; font-size:14px; z-index:1000;";
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2000);
+}
+
+function likeAnimation(el) {
+    const heart = el.querySelector('.heart-overlay');
+    heart.style.opacity = '1';
+    setTimeout(() => heart.style.opacity = '0', 700);
+    showToast("Вам сподобалось! ❤️");
+}
+
+window.onload = () => changeTab('map');
