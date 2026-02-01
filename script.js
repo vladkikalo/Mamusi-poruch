@@ -128,15 +128,24 @@ function openChat(name) {
                 <button onclick="changeTab('map')" style="background: none; border: none; color: #ff85a2; cursor:pointer;"><i class="fas fa-arrow-left fa-lg"></i></button>
                 <h3 style="margin-left: 15px;">${name}</h3>
             </div>
-            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 15px; background: #fafafa; text-align:left;">
-                <div style="background: #eee; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%;">Привіт! Як справи? 😊</div>
+            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 15px; background: #fafafa; text-align:left; position: relative;">
+                <div style="background: #eee; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%; font-size: 15px; margin-bottom: 10px;">Привіт! Як справи? 😊</div>
+                <!-- ОСЬ ЦЕЙ БЛОК ДЛЯ ДРУКУ -->
+                <div id="typing-indicator" style="display:none; font-size: 12px; color: #888; margin: 10px 0;">${name} друкує...</div>
             </div>
             <div style="display: flex; gap: 8px; padding: 15px; border-top: 1px solid #eee; background:white;">
                 <input type="text" id="msgInput" placeholder="Повідомлення..." style="flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px;">
-                <button class="main-btn" style="margin:0; width: 45px; height: 45px; border-radius: 50%;" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                <button class="main-btn" style="margin:0; width: 45px; height: 45px; border-radius: 50%;" onclick="sendMessage('${name}')"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>`;
+
+    // Ефект: матуся починає "друкувати" через 1.5 сек
+    setTimeout(() => {
+        const indicator = document.getElementById('typing-indicator');
+        if (indicator) indicator.style.display = 'block';
+    }, 1500);
 }
+
 
 function saveProfile() {
     localStorage.setItem('userName', document.getElementById('nameInput').value);
@@ -146,16 +155,31 @@ function saveProfile() {
     changeTab('profile');
 }
 
-function sendMessage() {
+function sendMessage(name) {
     const input = document.getElementById('msgInput');
     const chatBox = document.getElementById('chat-box');
+    const indicator = document.getElementById('typing-indicator');
+
     if (input && input.value.trim() !== "") {
+        // Твоє повідомлення
         const msg = document.createElement('div');
         msg.style = "background: #ff85a2; color: white; padding: 10px 15px; border-radius: 18px; margin: 8px 0; margin-left: auto; max-width: 80%; font-size: 15px; text-align:left;";
         msg.innerText = input.value;
         chatBox.appendChild(msg);
         input.value = "";
         chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Повертаємо ефект "друкує" перед відповіддю
+        if (indicator) indicator.style.display = 'block';
+
+        setTimeout(() => {
+            if (indicator) indicator.style.display = 'none';
+            const reply = document.createElement('div');
+            reply.style = "background: #eee; padding: 10px 15px; border-radius: 18px; margin: 8px 0; max-width: 80%; font-size: 15px; text-align:left;";
+            reply.innerText = "Звучить круто! Ми теж скоро вийдемо. До зустрічі! ✨";
+            chatBox.appendChild(reply);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 3000);
     }
 }
 
