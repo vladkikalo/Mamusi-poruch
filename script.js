@@ -1,9 +1,8 @@
 const allMoms = [
-    { name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk" },
-    { name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee" },
-    { name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby" }
-];
-
+    { name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", img: "mom1.jpg" },
+    { name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", img: "mom2.jpg" },
+    { name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", img: "mom3.jpg" }
+]
 function changeTab(tabName) {
     const content = document.getElementById('content');
     
@@ -55,24 +54,22 @@ function filterMoms(type) {
 
     const filtered = type === 'all' ? allMoms : allMoms.filter(mom => mom.type === type);
 
-    list.innerHTML = filtered.map(mom => `
-        <div class="mom-item">
-            <!-- ТУТ ТЕПЕР НАДІЙНІ ІКОНКИ В СПИСКУ -->
-            <div class="avatar-wrapper" ondblclick="likeMom(this)" style="display: flex; align-items: center; justify-content: center; width: 50px; height: 50px; border-radius: 50%; background: #ffeef2; border: 2px solid #ff85a2; color: #ff85a2; font-size: 24px; position: relative; margin-right: 12px;">
-                <i class="fas fa-female"></i>
-                <div class="status-online"></div>
-                <i class="fas fa-heart heart-animation"></i>
-            </div>
-            <div class="mom-info">
-                <h4>${mom.name}</h4>
-                <p style="color: #ff85a2; font-weight: bold;">${mom.status}</p>
-                <p>${mom.dist} • дитина ${mom.age}</p>
-            </div>
-            <button class="chat-btn" onclick="openChat('${mom.name}')">Написати</button>
+list.innerHTML = filtered.map(mom => `
+    <div class="mom-item">
+        <div class="avatar-wrapper" ondblclick="likeMom(this)" style="position: relative;">
+            <img src="${mom.img}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 2px solid #ff85a2;">
+            <div class="status-online"></div>
+            <i class="fas fa-heart heart-animation"></i>
         </div>
-    `).join('');
+        <div class="mom-info">
+            <h4>${mom.name}</h4>
+            <p style="color: #ff85a2; font-weight: bold;">${mom.status}</p>
+            <p>${mom.dist} • дитина ${mom.age}</p>
+        </div>
+        <button class="chat-btn" onclick="openChat('${mom.name}')">Написати</button>
+    </div>
+`).join('');
 }
-
 function openChat(name) {
     const content = document.getElementById('content');
     content.innerHTML = `
