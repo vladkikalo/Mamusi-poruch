@@ -1,14 +1,15 @@
+// 1. БАЗА ДАНИХ (Перевір наявність ком після кожного об'єкта)
 const allMoms = [
     { 
-        name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", img: "mom1.jpg",
+        name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", img: "mom1.jpg", district: "Оболонь",
         about: "Любимо активні ігри та довгі прогулянки. Шукаємо компанію!", interests: ["Еко", "Йога"]
     },
     { 
-        name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", img: "mom2.jpg",
+        name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", img: "mom2.jpg", district: "Позняки",
         about: "Спокійні прогулянки з кавою. Буду рада знайомству.", interests: ["Книги", "Психологія"]
     },
     { 
-        name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", img: "mom3.jpg",
+        name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", img: "mom3.jpg", district: "Оболонь",
         about: "Ми ще маленькі, гуляємо повільно біля озера.", interests: ["ГВ", "Фото"]
     }
 ];
@@ -17,6 +18,7 @@ let currentFilter = 'all';
 
 function changeTab(tabName) {
     const content = document.getElementById('content');
+    if (!content) return;
     window.scrollTo(0, 0);
 
     if (tabName === 'map') {
@@ -41,11 +43,7 @@ function changeTab(tabName) {
         filterMoms('all');
     } 
     else if (tabName === 'chats') {
-        content.innerHTML = `
-            <div class="card">
-                <h3><i class="fas fa-comments"></i> Повідомлення</h3>
-                <p style="color: #888; margin-top: 15px;">Немає активних діалогів.</p>
-            </div>`;
+        content.innerHTML = `<div class="card"><h3>Повідомлення</h3><p style="color:#888;">Немає активних діалогів.</p></div>`;
     }
     else if (tabName === 'profile') {
         const savedName = localStorage.getItem('userName') || "Матуся";
@@ -59,16 +57,14 @@ function changeTab(tabName) {
                          style="width: 100px; height: 100px; border-radius: 50%; border: 3px solid #ff85a2; object-fit: cover;">
                 </div>
                 <h3>Мій профіль</h3>
-                <input type="text" id="nameInput" value="${savedName}" placeholder="Ім'я" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 10px; font-size: 16px;">
-                
+                <input type="text" id="nameInput" value="${savedName}" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 10px; font-size: 16px;">
                 <select id="districtInput" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 10px; background: white; font-size: 16px;">
                     <option value="Оболонь" ${savedDistrict === 'Оболонь' ? 'selected' : ''}>Оболонь</option>
                     <option value="Позняки" ${savedDistrict === 'Позняки' ? 'selected' : ''}>Позняки</option>
                     <option value="Центр" ${savedDistrict === 'Центр' ? 'selected' : ''}>Центр</option>
                     <option value="Голосієво" ${savedDistrict === 'Голосієво' ? 'selected' : ''}>Голосієво</option>
                 </select>
-
-                <input type="text" id="statusInput" value="${savedStatus}" placeholder="Статус" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 15px; font-size: 16px;">
+                <input type="text" id="statusInput" value="${savedStatus}" style="padding: 12px; border-radius: 12px; border: 1px solid #ddd; width: 90%; margin-bottom: 15px; font-size: 16px;">
                 <button class="main-btn" onclick="saveProfile()" style="width: 90%; padding: 15px;">Зберегти профіль</button>
             </div>`;
     }
@@ -78,6 +74,8 @@ function filterMoms(type) {
     currentFilter = type;
     const list = document.getElementById('moms-list');
     const query = document.getElementById('searchInput')?.value.toLowerCase() || "";
+    const myDistrict = localStorage.getItem('userDistrict') || "Оболонь";
+    
     if (!list) return;
 
     document.querySelectorAll('.filter-tag').forEach(btn => {
@@ -85,7 +83,17 @@ function filterMoms(type) {
         if (btn.innerText.toLowerCase().includes(type) || (type === 'all' && btn.innerText === 'Всі')) btn.classList.add('active');
     });
 
-    const filtered = allMoms.filter(mom => (type === 'all' || mom.type === type) && mom.name.toLowerCase().includes(query));
+    const filtered = allMoms.filter(mom => {
+        const matchesType = (type === 'all' || mom.type === type);
+        const matchesSearch = mom.name.toLowerCase().includes(query);
+        const matchesDistrict = mom.district === myDistrict;
+        return matchesType && matchesSearch && matchesDistrict;
+    });
+
+    if (filtered.length === 0) {
+        list.innerHTML = `<p style="padding:20px; color:#888;">У районі ${myDistrict} поки нікого не знайдено 📍</p>`;
+        return;
+    }
 
     list.innerHTML = filtered.map(mom => `
         <div class="mom-item">
@@ -95,8 +103,8 @@ function filterMoms(type) {
             </div>
             <div class="mom-info" onclick="viewMomDetails('${mom.name}')" style="flex:1; cursor:pointer">
                 <h4>${mom.name}</h4>
-                <p style="color: #ff85a2; font-weight: bold;">${mom.status}</p>
-                <p>${mom.dist} • ${mom.age}</p>
+                <p style="color: #ff85a2; font-weight: bold; font-size: 14px;">${mom.status}</p>
+                <p style="font-size: 12px; color: #888;">${mom.district} • ${mom.age}</p>
             </div>
             <button class="chat-btn" onclick="openChat('${mom.name}')">Написати</button>
         </div>`).join('');
@@ -110,12 +118,8 @@ function viewMomDetails(name) {
             <div style="padding:20px;">
                 <button onclick="changeTab('map')" class="main-btn" style="padding:8px 15px; margin-bottom:15px; background:#eee; color:#333;">← Назад</button>
                 <h2>${mom.name}, ${mom.age}</h2>
-                <p style="color:#ff85a2; font-weight:bold;">${mom.status}</p>
-                <p style="color:#555; line-height:1.6; margin:15px 0;">${mom.about}</p>
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                    ${mom.interests.map(i => `<span style="background:#f0f0f0; padding:5px 12px; border-radius:15px; font-size:12px;">#${i}</span>`).join('')}
-                </div>
-                <button class="main-btn" style="width:100%; margin-top:25px; padding:18px; font-size:18px;" onclick="openChat('${mom.name}')">Почати чат</button>
+                <p style="color:#555;">${mom.about}</p>
+                <button class="main-btn" style="width:100%; margin-top:25px; padding:18px;" onclick="openChat('${mom.name}')">Почати чат</button>
             </div>
         </div>`;
 }
@@ -123,29 +127,22 @@ function viewMomDetails(name) {
 function openChat(name) {
     const content = document.getElementById('content');
     content.innerHTML = `
-        <div class="card" style="width: 100%; max-width: 380px; height: 500px; display: flex; flex-direction: column; padding:0; overflow:hidden;">
+        <div class="card" style="width: 100%; height: 500px; display: flex; flex-direction: column; padding:0; overflow:hidden;">
             <div style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 15px;">
-                <button onclick="changeTab('map')" style="background: none; border: none; color: #ff85a2; cursor:pointer;"><i class="fas fa-arrow-left fa-lg"></i></button>
+                <button onclick="changeTab('map')" style="background: none; border: none; color: #ff85a2;"><i class="fas fa-arrow-left fa-lg"></i></button>
                 <h3 style="margin-left: 15px;">${name}</h3>
             </div>
-            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 15px; background: #fafafa; text-align:left; position: relative;">
-                <div style="background: #eee; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%; font-size: 15px; margin-bottom: 10px;">Привіт! Як справи? 😊</div>
-                <!-- ОСЬ ЦЕЙ БЛОК ДЛЯ ДРУКУ -->
-                <div id="typing-indicator" style="display:none; font-size: 12px; color: #888; margin: 10px 0;">${name} друкує...</div>
+            <div id="chat-box" style="flex: 1; overflow-y: auto; padding: 15px; background: #fafafa; text-align:left;">
+                <div style="background: #eee; padding: 10px 15px; border-radius: 18px; display: inline-block; max-width: 80%;">Привіт! Як справи? 😊</div>
+                <div id="typing-indicator" style="display:none; font-size: 12px; color: #888; margin-top: 10px;">${name} друкує...</div>
             </div>
-            <div style="display: flex; gap: 8px; padding: 15px; border-top: 1px solid #eee; background:white;">
-                <input type="text" id="msgInput" placeholder="Повідомлення..." style="flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ddd; font-size: 16px;">
+            <div style="display: flex; gap: 8px; padding: 15px; background:white; border-top:1px solid #eee;">
+                <input type="text" id="msgInput" placeholder="Повідомлення..." style="flex: 1; padding: 12px; border-radius: 25px; border: 1px solid #ddd;">
                 <button class="main-btn" style="margin:0; width: 45px; height: 45px; border-radius: 50%;" onclick="sendMessage('${name}')"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>`;
-
-    // Ефект: матуся починає "друкувати" через 1.5 сек
-    setTimeout(() => {
-        const indicator = document.getElementById('typing-indicator');
-        if (indicator) indicator.style.display = 'block';
-    }, 1500);
+    setTimeout(() => { document.getElementById('typing-indicator').style.display = 'block'; }, 1500);
 }
-
 
 function saveProfile() {
     localStorage.setItem('userName', document.getElementById('nameInput').value);
@@ -159,24 +156,19 @@ function sendMessage(name) {
     const input = document.getElementById('msgInput');
     const chatBox = document.getElementById('chat-box');
     const indicator = document.getElementById('typing-indicator');
-
     if (input && input.value.trim() !== "") {
-        // Твоє повідомлення
         const msg = document.createElement('div');
-        msg.style = "background: #ff85a2; color: white; padding: 10px 15px; border-radius: 18px; margin: 8px 0; margin-left: auto; max-width: 80%; font-size: 15px; text-align:left;";
+        msg.style = "background: #ff85a2; color: white; padding: 10px 15px; border-radius: 18px; margin: 8px 0; margin-left: auto; max-width: 80%; text-align:left;";
         msg.innerText = input.value;
         chatBox.appendChild(msg);
         input.value = "";
         chatBox.scrollTop = chatBox.scrollHeight;
-
-        // Повертаємо ефект "друкує" перед відповіддю
         if (indicator) indicator.style.display = 'block';
-
         setTimeout(() => {
             if (indicator) indicator.style.display = 'none';
             const reply = document.createElement('div');
-            reply.style = "background: #eee; padding: 10px 15px; border-radius: 18px; margin: 8px 0; max-width: 80%; font-size: 15px; text-align:left;";
-            reply.innerText = "Звучить круто! Ми теж скоро вийдемо. До зустрічі! ✨";
+            reply.style = "background: #eee; padding: 10px 15px; border-radius: 18px; margin: 8px 0; max-width: 80%; text-align:left;";
+            reply.innerText = "До зустрічі! ✨";
             chatBox.appendChild(reply);
             chatBox.scrollTop = chatBox.scrollHeight;
         }, 3000);
