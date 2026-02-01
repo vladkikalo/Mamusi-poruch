@@ -1,10 +1,35 @@
-// 1. БАЗА ДАНИХ МАТУСЬ (Перевір, щоб назви файлів на GitHub були малими літерами)
 const allMoms = [
-    { name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", img: "mom1.jpg" },
-    { name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", img: "mom2.jpg" },
-    { name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", img: "mom3.jpg" }
+    { 
+        name: "Олена", 
+        status: "🏃‍♀️ Йду в парк", 
+        dist: "300м", 
+        age: "1.2 р.", 
+        type: "walk", 
+        img: "mom1.jpg",
+        about: "Привіт! Люблю довгі прогулянки та каву без цукру. Моєму синочку 1 рік і 2 місяці, ми дуже активні!",
+        interests: ["Еко-виховання", "Йога", "Монтессорі"]
+    },
+    { 
+        name: "Марина", 
+        status: "☕ На каву", 
+        dist: "600м", 
+        age: "8 міс.", 
+        type: "coffee", 
+        img: "mom2.jpg",
+        about: "Шукаю подруг для спокійних посиденьок, поки малеча спить у візочках.",
+        interests: ["Книги", "Психологія", "Серіали"]
+    },
+    { 
+        name: "Світлана", 
+        status: "👶 Немовлята", 
+        dist: "1.2 км", 
+        age: "3 міс.", 
+        type: "baby", 
+        img: "mom3.jpg",
+        about: "Ми ще зовсім маленькі, тому гуляємо повільно біля озера.",
+        interests: ["ГВ", "Здоровий сон", "Фотографія"]
+    }
 ];
-
 function changeTab(tabName) {
     const content = document.getElementById('content');
     
@@ -67,25 +92,27 @@ function filterMoms(type) {
     }
 
     const filtered = type === 'all' ? allMoms : allMoms.filter(mom => mom.type === type);
-
     list.innerHTML = filtered.map(mom => `
         <div class="mom-item" style="padding: 20px; margin-bottom: 15px;">
-            <div class="avatar-wrapper" ondblclick="likeMom(this)" style="position: relative; width: 65px; height: 65px; margin-right: 15px;">
+            <!-- Тепер клік по фото відкриває деталі -->
+            <div class="avatar-wrapper" onclick="viewMomDetails('${mom.name}')" style="position: relative; width: 65px; height: 65px; margin-right: 15px; cursor: pointer;">
                 <img src="${mom.img}" 
                      onerror="this.src='https://ui-avatars.com{encodeURIComponent(mom.name)}&background=ff85a2&color=fff&size=128'" 
-                     style="width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid #ff85a2; background: #eee;">
+                     style="width: 65px; height: 65px; border-radius: 50%; object-fit: cover; border: 2px solid #ff85a2;">
                 <div class="status-online"></div>
-                <i class="fas fa-heart heart-animation"></i>
             </div>
-            <div class="mom-info" style="flex: 1;">
-                <h4 style="font-size: 18px; margin: 0;">${mom.name}</h4>
+            
+            <div class="mom-info" style="flex: 1;" onclick="viewMomDetails('${mom.name}')">
+                <!-- Тепер клік по імені теж відкриває деталі -->
+                <h4 style="font-size: 18px; margin: 0; cursor: pointer; color: #333;">${mom.name}</h4>
                 <p style="color: #ff85a2; font-weight: bold; font-size: 14px; margin: 3px 0;">${mom.status}</p>
                 <p style="font-size: 13px; color: #888;">${mom.dist} • дитина ${mom.age}</p>
             </div>
+            
             <button class="chat-btn" onclick="openChat('${mom.name}')">Написати</button>
         </div>
     `).join('');
-}
+    }
 
 function openChat(name) {
     const content = document.getElementById('content');
@@ -157,3 +184,37 @@ window.addEventListener('load', () => {
         if (splash) splash.classList.add('fade-out');
     }, 2000);
 });
+function viewMomDetails(name) {
+    const mom = allMoms.find(m => m.name === name);
+    const content = document.getElementById('content');
+    
+    content.innerHTML = `
+        <div class="card" style="width: 100%; max-width: 380px; text-align: left; padding: 0; overflow: hidden; border-radius: 25px;">
+            <div style="position: relative;">
+                <img src="${mom.img}" onerror="this.src='https://ui-avatars.com{mom.name}&background=ff85a2&color=fff'" style="width: 100%; height: 250px; object-fit: cover;">
+                <button onclick="changeTab('map')" style="position: absolute; top: 15px; left: 15px; background: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.2); color: #ff85a2; cursor: pointer;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="margin: 0;">${mom.name}, ${mom.age}</h2>
+                    <span style="background: #ffeef2; color: #ff85a2; padding: 5px 12px; border-radius: 15px; font-size: 14px; font-weight: bold;">${mom.dist}</span>
+                </div>
+                <p style="color: #ff85a2; font-weight: bold; margin: 10px 0;">${mom.status}</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <p style="color: #555; line-height: 1.5;">${mom.about}</p>
+                
+                <h4 style="margin: 15px 0 10px 0;">Інтереси:</h4>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    ${mom.interests.map(i => `<span style="background: #f0f0f0; padding: 5px 10px; border-radius: 10px; font-size: 12px; color: #666;">#${i}</span>`).join('')}
+                </div>
+                
+                <button class="main-btn" onclick="openChat('${mom.name}')" style="width: 100%; margin-top: 25px; padding: 18px; font-size: 18px;">
+                    <i class="fas fa-comments"></i> Почати чат
+                </button>
+            </div>
+        </div>
+    `;
+}
