@@ -1,7 +1,9 @@
+/* Базові налаштування для зручності */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', sans-serif;
     margin: 0;
-    background-color: #f0f2f5;
+    background-color: #f9f9f9;
+    font-size: 18px; /* Збільшений шрифт для легкого читання */
     display: flex;
     flex-direction: column;
     height: 100vh;
@@ -11,336 +13,73 @@ header {
     background: #ff85a2;
     color: white;
     text-align: center;
-    padding: 15px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding: 20px; /* Більше простору зверху */
 }
 
-#content {
-    flex: 1;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-    text-align: center;
-    width: 100%;
-    max-width: 350px;
-}
-
-.main-btn {
-    background: #ff85a2;
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 25px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 15px;
-    transition: transform 0.2s;
-}
-
-.main-btn:hover {
-    transform: scale(1.05);
-}
-
-.bottom-nav {
-    display: flex;
-    justify-content: space-around;
-    background: white;
-    padding: 12px 0;
-    border-top: 1px solid #eee;
-    padding-bottom: 25px; /* Місце для зручного натискання */
-}
-
-.bottom-nav button {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: #a0a0a0;
-    gap: 5px;
-    border: none;
-    background: none;
-    cursor: pointer;
-    transition: 0.3s;
-    flex: 1;
-}
-
-.bottom-nav button i {
-    font-size: 22px;
-}
-
-.bottom-nav button span {
-    font-size: 12px;
-}
-
-.bottom-nav button:hover {
-    color: #ff85a2;
-}
-.avatar-container {
-    position: relative;
-    width: 100px;
-    height: 100px;
-    margin: 0 auto 15px;
-}
-
-.avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid #ff85a2;
-}
-
-.upload-btn {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    background: #ff85a2;
-    color: white;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-    border: 2px solid white;
-}
-#map {
-    width: 100%;
-    height: 100%;
-    min-height: 350px; /* Гарантуємо, що мапа не стиснеться в нуль */
-    border-radius: 15px;
-    z-index: 1; /* Щоб мапа не перекривала меню */
-}
-#map-container {
-    display: block !important;
-    min-height: 350px !important;
-    height: 350px !important;
-    width: 100% !important;
-    background-color: #e5e3df; /* Колір "заглушки", поки вантажиться мапа */
-}
-#map { height: 100%; width: 100%; min-height: 350px; }
+/* Картки матусь у списку */
 .mom-item {
     display: flex;
     align-items: center;
     background: white;
-    padding: 12px;
-    border-radius: 16px;
-    margin-bottom: 10px;
+    padding: 20px; /* Збільшений відступ (щоб легше попадати пальцем) */
+    border-radius: 20px;
+    margin: 15px;
     border: 1px solid #eee;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
-.mom-item img {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    margin-right: 12px;
-    object-fit: cover;
-}
-
-.mom-info h4 {
-    margin: 0;
-    font-size: 16px;
-    color: #333;
-}
-
-.mom-info p {
-    margin: 0;
-    font-size: 12px;
-    color: #888;
-}
-
+/* Кнопка "Написати" */
 .chat-btn {
     margin-left: auto;
     background: #ff85a2;
     color: white;
     border: none;
-    padding: 8px 12px;
-    border-radius: 12px;
-    font-size: 12px;
+    padding: 15px 20px; /* Велика кнопка для великого пальця */
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
-}
-.avatar-wrapper {
-    position: relative;
-    display: inline-block;
-    margin-right: 12px;
+    min-width: 100px; /* Гарантований розмір кнопки */
 }
 
-.status-online {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
-    background-color: #4cd137; /* Яскраво-зелений */
-    border: 2px solid white;
-    border-radius: 50%;
-}
-
-/* Ефект пульсації для "живого" вигляду */
-@keyframes pulse-online {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 209, 55, 0.7); }
-    70% { transform: scale(1.1); box-shadow: 0 0 0 5px rgba(76, 209, 55, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(76, 209, 55, 0); }
-}
-
-.status-online {
-    animation: pulse-online 2s infinite;
-}
-.filter-container {
+/* Нижня панель навігації (Tab Bar) */
+.bottom-nav {
     display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding: 10px 0 20px 10px;
-    scrollbar-width: none; /* прибираємо смугу прокрутки */
-}
-
-.filter-tag {
+    justify-content: space-around;
     background: white;
-    border: 1px solid #ff85a2;
-    color: #ff85a2;
-    padding: 8px 15px;
-    border-radius: 20px;
-    white-space: nowrap;
-    font-size: 13px;
-    cursor: pointer;
-    transition: 0.3s;
+    padding: 15px 0 35px 0; /* Збільшений відступ знизу для iPhone/Android */
+    border-top: 1px solid #eee;
 }
 
-.filter-tag.active {
-    background: #ff85a2;
-    color: white;
-}
-.toast {
-    position: fixed;
-    top: -100px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #ff85a2;
-    color: white;
-    padding: 15px 30px;
-    border-radius: 30px;
-    box-shadow: 0 5px 15px rgba(255, 133, 162, 0.4);
-    z-index: 1000;
-    transition: top 0.5s ease;
-}
-
-.toast.show {
-    top: 20px;
-}
-.typing {
-    font-size: 12px;
+.bottom-nav button {
+    border: none;
+    background: none;
     color: #888;
-    margin-bottom: 10px;
-    display: none; /* Спочатку приховано */
-}
-
-.typing span {
-    animation: blink 1.4s infinite both;
-    font-size: 18px;
-}
-
-.typing span:nth-child(2) { animation-delay: .2s; }
-.typing span:nth-child(3) { animation-delay: .4s; }
-
-@keyframes blink {
-    0% { opacity: .2; }
-    20% { opacity: 1; }
-    100% { opacity: .2; }
-}
-#splash-screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #ff85a2; /* Наш фірмовий рожевий */
-    color: white;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    z-index: 9999;
-    transition: opacity 0.8s ease, visibility 0.8s;
+    gap: 8px;
+    cursor: pointer;
+    flex: 1; /* Рівномірний розподіл кнопок на весь екран */
 }
 
-.splash-content i {
-    font-size: 60px;
-    margin-bottom: 20px;
-    color: white;
-    filter: none; /* Прибираємо неонове сяйво */
+.bottom-nav button i {
+    font-size: 28px; /* Великі іконки */
 }
 
-.loader {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
+.bottom-nav button span {
+    font-size: 14px;
 }
 
-
-
-.splash-content {
-    text-align: center;
+/* Стиль для фото/іконки */
+.avatar-wrapper {
+    width: 60px; /* Збільшили розмір фото */
+    height: 60px;
+    margin-right: 15px;
 }
 
-.splash-content i {
-    font-size: 60px;
-    margin-bottom: 20px;
-}
-
-.splash-content h1 {
-    font-size: 32px;
-    margin: 0;
-}
-
-.loader {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid white;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    animation: spin 1s linear infinite;
-    margin: 20px auto;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.fade-out {
-    opacity: 0;
-    visibility: hidden;
-}
-.heart-animation {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: white;
-    font-size: 50px;
-    opacity: 0;
-    pointer-events: none;
-    z-index: 10;
-}
-
-@keyframes heart-pop {
-    0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.9; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
-}
-
-.animate-heart {
-    animation: heart-pop 0.8s ease-out;
+/* Стиль для Toast повідомлень */
+.toast {
+    font-size: 18px;
+    padding: 15px 25px;
 }
