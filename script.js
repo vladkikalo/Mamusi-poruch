@@ -1,5 +1,5 @@
 // ===================================================
-// 1. БАЗА ДАНИХ ТА КОНФІГУРАЦІЯ
+// 1. БАЗА ДАНИХ (ПЕРЕВІРЕНО: СТАТУСИ ТА ВІК НА МІСЦІ)
 // ===================================================
 const districtCoords = {
     "Всі райони": "50.4501,30.5234",
@@ -11,17 +11,17 @@ const districtCoords = {
 
 const allMoms = [
     { 
-        name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", age: "1.2 р.", type: "walk", district: "Оболонь", 
+        name: "Олена", status: "🏃‍♀️ Йду в парк", dist: "300м", childAge: "1.2 р.", type: "walk", district: "Оболонь", 
         img: "mom1.jpg", backup: "https://images.unsplash.com",
         about: "Любимо активні ігри та еко-товари.", interests: ["Йога", "Еко"], isOnline: true 
     },
     { 
-        name: "Марина", status: "☕ На каву", dist: "600м", age: "8 міс.", type: "coffee", district: "Позняки", 
+        name: "Марина", status: "☕ На каву", dist: "600м", childAge: "8 міс.", type: "coffee", district: "Позняки", 
         img: "mom2.jpg", backup: "https://images.unsplash.com",
         about: "Шукаю подруг для спілкування за кавою.", interests: ["Книги", "Психологія"], isOnline: false 
     },
     { 
-        name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", age: "3 міс.", type: "baby", district: "Оболонь", 
+        name: "Світлана", status: "👶 Немовлята", dist: "1.2 км", childAge: "3 міс.", type: "baby", district: "Оболонь", 
         img: "mom3.jpg", backup: "https://images.unsplash.com",
         about: "Гуляємо повільно біля озера.", interests: ["Фото", "ГВ"], isOnline: true 
     }
@@ -95,7 +95,7 @@ function filterMoms(type) {
                     ${mom.isOnline ? '<div style="position: absolute; bottom: 3px; right: 3px; width: 12px; height: 12px; background: #4CAF50; border: 2px solid white; border-radius: 50%;"></div>' : ''}
                 </div>
                 <div style="flex:1; margin-left: 15px;">
-                    <h4 style="margin:0;">${mom.name}</h4>
+                    <h4 style="margin:0;">${mom.name}, <span style="font-size:13px; color:#888;">${mom.childAge}</span></h4>
                     <p style="color:#ff85a2; font-size:13px; margin:3px 0; font-weight:bold;">${mom.status}</p>
                 </div>
                 <div style="color:#ccc;">›</div>
@@ -109,7 +109,7 @@ function filterMoms(type) {
 }
 
 // ===================================================
-// 3. СТОРІНКА МАТУСІ ТА ЛАЙКИ
+// 3. ПЕРЕГЛЯД АНКЕТИ (ВКЛЮЧАЮЧИ СТАТУС ТА ВІК)
 // ===================================================
 function viewMomDetails(name) {
     const mom = allMoms.find(m => m.name === name);
@@ -123,18 +123,15 @@ function viewMomDetails(name) {
                 <div class="avatar-container" ondblclick="likeAnimation(this)" style="width: 100%; height: 300px; overflow: hidden; border-radius: 20px 20px 0 0; position: relative;">
                     <img src="${mom.img}" onerror="this.src='${mom.backup}'" style="width: 100%; height: 100%; object-fit: cover;">
                     <div class="heart-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 70px; opacity: 0; transition: 0.3s; pointer-events: none;">❤️</div>
-                    ${mom.isOnline ? '<div style="position: absolute; bottom: 15px; left: 15px; background: #4CAF50; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">ЗАРАЗ ОНЛАЙН</div>' : ''}
                 </div>
                 <div style="padding: 20px; text-align: left;">
-                    <h2>${mom.name}, ${mom.age}</h2>
-                    <p style="color: #ff85a2; font-weight: bold; margin: 10px 0;">📍 ${mom.district} • ${mom.dist}</p>
-                    <p style="color: #666; line-height: 1.6;">${mom.about || "Рада новим знайомствам!"}</p>
-                    <div style="display:flex; gap:8px; margin-top:10px;">
-                        ${(mom.interests || []).map(i => `<span style="background:#eee; padding:5px 10px; border-radius:15px; font-size:12px;">#${i}</span>`).join('')}
-                    </div>
+                    <h2 style="margin: 0;">${mom.name}</h2>
+                    <p style="color:#ff85a2; font-weight:bold; margin: 10px 0;">👶 Дитині: ${mom.childAge} • ${mom.status}</p>
+                    <p style="color: #888; margin-bottom: 10px;">📍 ${mom.district} • ${mom.dist}</p>
+                    <p style="color: #666; line-height: 1.6;">${mom.about || "Рада знайомству!"}</p>
                     <button onclick="openChat('${mom.name}', '${mom.img}', '${mom.backup}')" 
-                            style="width: 100%; margin-top: 25px; padding: 18px; background: #ff85a2; color: white; border: none; border-radius: 15px; font-weight: bold; font-size: 16px;">
-                        Написати матусі
+                            style="width: 100%; margin-top: 25px; padding: 18px; background: #ff85a2; color: white; border: none; border-radius: 15px; font-weight: bold;">
+                        Написати повідомлення
                     </button>
                 </div>
             </div>`;
@@ -143,7 +140,7 @@ function viewMomDetails(name) {
 }
 
 // ===================================================
-// 4. ПОВНОЦІННИЙ ЧАТ ТА ШВИДКІ ПОВІДОМЛЕННЯ
+// 4. ЧАТ З ПІДТРИМКОЮ ENTER
 // ===================================================
 function openChat(name, img, backup) {
     const content = document.getElementById('content');
@@ -155,14 +152,15 @@ function openChat(name, img, backup) {
                 <h4 style="margin-left: 10px;">${name}</h4>
             </div>
             <div id="chat-messages" style="flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column;">
-                <div style="align-self: flex-start; background: #f0f0f0; padding: 10px 15px; border-radius: 15px; margin-bottom:10px; max-width: 80%;">Привіт! 😊 Рада поспілкуватися!</div>
+                <div style="align-self: flex-start; background: #f0f0f0; padding: 10px 15px; border-radius: 15px; margin-bottom:10px; max-width: 80%;">Привіт! 😊</div>
                 <div id="typing-indicator" style="display:none; color:#888; font-size:12px; margin-bottom:10px;">${name} друкує...</div>
             </div>
             <div style="display: flex; gap: 10px; padding: 10px;">
-                <input type="text" id="messageInput" placeholder="Ваше повідомлення..." style="flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ddd;">
-                <button onclick="sendMessage('${name}')" style="background:#ff85a2; color:white; border:none; border-radius:50%; width:45px; height:45px;">></button>
+                <input type="text" id="messageInput" placeholder="Повідомлення..." style="flex: 1; padding: 12px; border-radius: 20px; border: 1px solid #ddd;" onkeypress="if(event.key === 'Enter') sendMessage('${name}')">
+                <button onclick="sendMessage('${name}')" style="background:#ff85a2; color:white; border:none; border-radius:50%; width:45px; height:45px; cursor:pointer;">></button>
             </div>
         </div>`;
+    document.getElementById('messageInput').focus();
 }
 
 function sendMessage(name) {
@@ -180,42 +178,39 @@ function sendMessage(name) {
         msgBox.scrollTop = msgBox.scrollHeight;
         setTimeout(() => {
             typing.style.display = 'none';
-            msgBox.innerHTML += `<div style="align-self: flex-start; background:#f0f0f0; padding:10px 15px; border-radius:15px; margin-bottom:10px; max-width:80%;">Чудово! Спишемося пізніше 👋</div>`;
+            msgBox.innerHTML += `<div style="align-self: flex-start; background:#f0f0f0; padding:10px 15px; border-radius:15px; margin-bottom:10px; max-width:80%;">Зрозуміло! До зустрічі 👋</div>`;
             msgBox.scrollTop = msgBox.scrollHeight;
         }, 1500);
     }, 1000);
 }
 
-function quickMessage(name, text) {
-    showToast(`Повідомлення надіслано! 📩`);
-    setTimeout(() => {
-        const mom = allMoms.find(m => m.name === name);
-        openChat(name, mom.img, mom.backup);
-        const msgBox = document.getElementById('chat-messages');
-        msgBox.innerHTML += `<div style="align-self: flex-end; background:#ff85a2; color:white; padding:10px 15px; border-radius:15px; margin-bottom:10px; max-width:80%;">${text}</div>`;
-        msgBox.scrollTop = msgBox.scrollHeight;
-    }, 800);
-}
-
 // ===================================================
-// 5. ПРОФІЛЬ ТА НАЛАШТУВАННЯ
+// 5. ПРОФІЛЬ (ВЛАСНИЙ СТАТУС ТА ВІК ДИТИНИ)
 // ===================================================
 function renderProfile(content) {
     const name = localStorage.getItem('userName') || "Матуся";
     const dist = localStorage.getItem('userDistrict') || "Всі райони";
     const status = localStorage.getItem('userStatus') || "Планую прогулянку";
+    const childAge = localStorage.getItem('userChildAge') || "1 рік";
+    
     content.innerHTML = `
         <div class="card" style="text-align: center; padding: 30px 20px;">
-            <div class="avatar-container" ondblclick="likeAnimation(this)" style="position: relative; display: inline-block;">
-                <img src="${getAvatar(name)}" style="width:120px; height:120px; border-radius:50%; border:4px solid #ff85a2;">
-                <div class="heart-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 50px; opacity: 0; transition: 0.3s;">❤️</div>
-            </div>
-            <h3 style="margin-top:15px;">Налаштування</h3>
-            <input type="text" id="nameInput" value="${name}" placeholder="Ім'я" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid #ddd;">
-            <select id="districtInput" style="width:100%; padding:12px; margin-bottom:10px; border-radius:12px; border:1px solid #ddd; background:white;">
+            <img src="${getAvatar(name)}" style="width:120px; height:120px; border-radius:50%; border:4px solid #ff85a2; margin-bottom:15px;">
+            <h3>Мій профіль</h3>
+            <label style="display:block; text-align:left; font-size:12px; color:#888; margin-bottom:5px;">Ваше ім'я</label>
+            <input type="text" id="nameInput" value="${name}" style="width:100%; padding:12px; margin-bottom:15px; border-radius:12px; border:1px solid #ddd; box-sizing:border-box;">
+            
+            <label style="display:block; text-align:left; font-size:12px; color:#888; margin-bottom:5px;">Район</label>
+            <select id="districtInput" style="width:100%; padding:12px; margin-bottom:15px; border-radius:12px; border:1px solid #ddd; background:white;">
                 ${Object.keys(districtCoords).map(d => `<option value="${d}" ${dist === d ? 'selected' : ''}>${d}</option>`).join('')}
             </select>
-            <input type="text" id="statusInput" value="${status}" placeholder="Статус" style="width:100%; padding:12px; margin-bottom:20px; border-radius:12px; border:1px solid #ddd;">
+
+            <label style="display:block; text-align:left; font-size:12px; color:#888; margin-bottom:5px;">Вік вашої дитини</label>
+            <input type="text" id="childAgeInput" value="${childAge}" placeholder="Напр: 1.5 роки" style="width:100%; padding:12px; margin-bottom:15px; border-radius:12px; border:1px solid #ddd; box-sizing:border-box;">
+
+            <label style="display:block; text-align:left; font-size:12px; color:#888; margin-bottom:5px;">Ваш статус (що ви робите?)</label>
+            <input type="text" id="statusInput" value="${status}" style="width:100%; padding:12px; margin-bottom:20px; border-radius:12px; border:1px solid #ddd; box-sizing:border-box;">
+            
             <button class="main-btn" onclick="saveProfile()" style="width:100%; padding:18px; background:#ff85a2; color:white; border:none; border-radius:15px; font-weight:bold;">Зберегти зміни</button>
         </div>`;
 }
@@ -224,13 +219,13 @@ function saveProfile() {
     localStorage.setItem('userName', document.getElementById('nameInput').value);
     localStorage.setItem('userDistrict', document.getElementById('districtInput').value);
     localStorage.setItem('userStatus', document.getElementById('statusInput').value);
-    showToast("Дані оновлено! ✨");
+    localStorage.setItem('userChildAge', document.getElementById('childAgeInput').value);
+    
+    showToast("Дані збережено! ✨");
     setTimeout(() => changeTab('map'), 800);
 }
 
-// ===================================================
-// 6. СЕРВІСНІ ФУНКЦІЇ (ТОСТИ, ЛАЙКИ)
-// ===================================================
+// СЕРВІСНІ ФУНКЦІЇ
 function showToast(msg) {
     const t = document.createElement('div');
     t.innerText = msg;
@@ -239,12 +234,17 @@ function showToast(msg) {
     setTimeout(() => t.remove(), 2500);
 }
 
+function quickMessage(name, text) {
+    showToast(`Надіслано! 📩`);
+    const mom = allMoms.find(m => m.name === name);
+    setTimeout(() => openChat(name, mom.img, mom.backup), 600);
+}
+
 function likeAnimation(el) {
     const heart = el.querySelector('.heart-overlay');
     heart.style.opacity = '1';
-    heart.style.transform = 'translate(-50%, -50%) scale(1.3)';
-    setTimeout(() => { heart.style.opacity = '0'; heart.style.transform = 'translate(-50%, -50%) scale(1)'; }, 700);
-    showToast("Вам сподобалось! ❤️");
+    setTimeout(() => heart.style.opacity = '0', 700);
+    showToast("❤️");
 }
 
 window.onload = () => changeTab('map');
